@@ -205,18 +205,30 @@ st.markdown(f"""
         margin: 0 auto;
     }}
 
-    /* Audio player */
-    audio {{
-        border-radius: 8px;
-        width: 100%;
-        margin: 20px auto;
-        max-width: 600px;
+    /* Audio player - FIXED TO CENTER */
+    .stAudio {{
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin: 20px auto !important;
+        width: 100% !important;
     }}
 
-    .stAudio {{
-        display: flex;
-        justify-content: center;
-        margin: 20px 0;
+    .stAudio > div {{
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+        max-width: 600px !important;
+        margin: 0 auto !important;
+    }}
+
+    audio {{
+        border-radius: 8px !important;
+        width: 100% !important;
+        max-width: 600px !important;
+        margin: 0 auto !important;
+        border: none !important;
+        outline: none !important;
     }}
 
     /* Remove link icons from all headers */
@@ -253,6 +265,10 @@ st.markdown(f"""
 
         .stImage img {{
             max-width: 95% !important;
+        }}
+
+        .stAudio {{
+            margin: 20px 0 !important;
         }}
     }}
 </style>
@@ -484,13 +500,14 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # Voice selection centered
+    # Voice selection centered - FIXED EMPTY LABEL
     st.markdown('<div class="centered">', unsafe_allow_html=True)
     voices = get_available_voices()
     selected_voice_name = st.selectbox(
-        "",
+        "Select Voice",  # Added proper label
         list(voices.keys()),
-        index=0
+        index=0,
+        label_visibility="hidden"  # Hide the label for visual purposes
     )
     selected_voice = voices[selected_voice_name]
 
@@ -501,7 +518,10 @@ def main():
                 audio_data = asyncio.run(create_audio_from_all_articles(all_articles, selected_voice))
 
                 if audio_data:
-                    st.audio(audio_data, format='audio/mp3')
+                    # Center the audio player using columns
+                    col1, col2, col3 = st.columns([1, 2, 1])
+                    with col2:
+                        st.audio(audio_data, format='audio/mp3')
                 else:
                     st.error("Failed to generate audio. Please try again.")
 
